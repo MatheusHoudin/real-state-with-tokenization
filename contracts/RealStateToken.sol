@@ -12,5 +12,8 @@ contract RealStateToken is ERC20 {
     ) ERC20(tokenName, tokenSymbol) {
         _mint(owner, initialSupply);
     }
-    
+
+    function decimals() public view virtual override returns (uint8) {
+		return 2;
+	}
 }
