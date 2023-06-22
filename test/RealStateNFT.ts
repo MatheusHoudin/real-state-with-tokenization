@@ -1,5 +1,5 @@
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
-import { anyUint } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
+import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
@@ -37,7 +37,7 @@ describe("RealStateNFT", function () {
         it("Should mint a new NFT", async function() {
             const {nftContract, owner} = await loadFixture(deployRealStateNFT);
 
-            await nftContract.createNFT("www.google.com", {
+            await nftContract.createNFT("www.google.com", 0, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
@@ -49,17 +49,17 @@ describe("RealStateNFT", function () {
         it("Should emit new created NFT event", async function() {
             const {nftContract, owner} = await loadFixture(deployRealStateNFT);
 
-            await expect(await nftContract.createNFT("www.google.com", {
+            await expect(await nftContract.createNFT("www.google.com", 0, "", "", {
                 value: ethers.parseEther("0.5")
             }))
             .to.emit(nftContract, "NewNFT")
-            .withArgs(0, "www.google.com"); // We accept any value as `when` arg
+            .withArgs(0, "www.google.com", anyValue, owner.address); // We accept any value as `when` arg
         });
 
         it("Should validate the token owner", async function() {
             const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
 
-            await nftContract.connect(user1).createNFT("www.google.com", {
+            await nftContract.connect(user1).createNFT("www.google.com", 0, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
@@ -71,7 +71,7 @@ describe("RealStateNFT", function () {
         it("Should show error when ETH value is less than minimum required", async function() {
             const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
 
-            await expect(nftContract.connect(user1).createNFT("www.google.com", {
+            await expect(nftContract.connect(user1).createNFT("www.google.com", 0, "", "", {
                 value: ethers.parseEther("0.49")
             })).to.be.revertedWith("Value sent is not equals to the required ETH value.");
         });
@@ -79,7 +79,7 @@ describe("RealStateNFT", function () {
         it("Should show error when ETH value is more than minimum required", async function() {
             const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
 
-            await expect(nftContract.connect(user1).createNFT("www.google.com", {
+            await expect(nftContract.connect(user1).createNFT("www.google.com", 0, "", "", {
                 value: ethers.parseEther("0.501")
             })).to.be.revertedWith("Value sent is not equals to the required ETH value.");
         });
@@ -91,7 +91,7 @@ describe("RealStateNFT", function () {
 
             ethers.provider.getBalance(nftContract);
 
-            await nftContract.connect(user1).createNFT("www.google.com", {
+            await nftContract.connect(user1).createNFT("www.google.com", 0, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
@@ -99,6 +99,19 @@ describe("RealStateNFT", function () {
             
             expect(previousContractBalance).to.be.equal(0);
             expect(contractBalanceAfterTransaction).to.be.equals(ethers.parseEther("0.5"));
+        });
+
+        it("Should validate the contract balance increases after a Mint", async function() {
+            const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
+            
+            await nftContract.connect(user1).createNFT("www.google.com", 0, "", "", {
+                value: ethers.parseEther("0.5")
+            });
+
+            const nftTokenAddress = await nftContract.nftTokens(0);
+
+            expect(nftTokenAddress).to.not.equal("0x0000000000000000000000000000000000000000")
+
         });
     });
 
