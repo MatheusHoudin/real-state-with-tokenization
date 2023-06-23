@@ -102,7 +102,6 @@ describe("RealStateNFT", function () {
         });
     });
 
-    /*
     describe("Buying tokens", async function() {
         it("Should validate the ", async function() {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
@@ -111,20 +110,26 @@ describe("RealStateNFT", function () {
                 value: ethers.parseEther("0.5")
             });
 
-            const nftTokenAddress = await nftContract.nftTokens(0);
+            const rstCoinContractAddress = await nftContract.tokenCoin(0);
 
-            const RealStateToken = await ethers.getContractFactory("RealStateToken");
-            const coinContract = await RealStateToken.attach(nftTokenAddress);
+            const RealStateCoin = await ethers.getContractFactory("RealStateCoin");
+            const rstCoinContract = await RealStateCoin.attach(rstCoinContractAddress);
 
-            await nftContract.connect(user2).buyTokens(0, user2.address,  {
-                value: ethers.parseEther("2.123213123")
+            let user1CoinBalance = await rstCoinContract.balanceOf(user1.address)
+
+            expect(user1CoinBalance).to.equal(100);
+            
+            await nftContract.connect(user2).buyCoins(0, user2.address,  {
+                value: ethers.parseEther("0.0021")
             });
 
-            console.log("User 2 ETH amount: " + await ethers.provider.getBalance(user2));
-            console.log("User 2 RST amount: "+ await coinContract.balanceOf(user2.address));
-
-            expect(nftTokenAddress).to.not.equal("0x0000000000000000000000000000000000000000")
+            const user2CoinBalance = await rstCoinContract.balanceOf(user2.address)
+            user1CoinBalance = await rstCoinContract.balanceOf(user1.address)
+            
+            expect(user1CoinBalance).to.equal(79);
+            expect(user2CoinBalance).to.equal(21);
+            expect(rstCoinContractAddress).to.not.equal("0x0000000000000000000000000000000000000000")
 
         });
-    });*/
+    });
 });

@@ -37,7 +37,8 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
         tokenCoin[newTokenId] = new RealStateCoin(
             initialSupply,
             coinName,
-            coinSymbol
+            coinSymbol,
+            msg.sender
         );
         
         emit NewNFT(newTokenId, nftURI, address(tokenCoin[newTokenId]), msg.sender);
