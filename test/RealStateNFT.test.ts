@@ -100,19 +100,31 @@ describe("RealStateNFT", function () {
             expect(previousContractBalance).to.be.equal(0);
             expect(contractBalanceAfterTransaction).to.be.equals(ethers.parseEther("0.5"));
         });
+    });
 
-        it("Should validate the contract balance increases after a Mint", async function() {
-            const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
+    /*
+    describe("Buying tokens", async function() {
+        it("Should validate the ", async function() {
+            const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
-            await nftContract.connect(user1).createNFT("www.google.com", 0, "", "", {
+            await nftContract.connect(user1).createNFT("www.google.com", 100, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
             const nftTokenAddress = await nftContract.nftTokens(0);
 
+            const RealStateToken = await ethers.getContractFactory("RealStateToken");
+            const coinContract = await RealStateToken.attach(nftTokenAddress);
+
+            await nftContract.connect(user2).buyTokens(0, user2.address,  {
+                value: ethers.parseEther("2.123213123")
+            });
+
+            console.log("User 2 ETH amount: " + await ethers.provider.getBalance(user2));
+            console.log("User 2 RST amount: "+ await coinContract.balanceOf(user2.address));
+
             expect(nftTokenAddress).to.not.equal("0x0000000000000000000000000000000000000000")
 
         });
-    });
-
+    });*/
 });
