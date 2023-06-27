@@ -8,6 +8,7 @@ import "hardhat/console.sol";
 contract RealStateCoin is ERC20, Ownable {
 
     uint public constant COIN_PRICE = 0.0001 ether;
+    uint256 public lockedAmount;
 
     modifier isARoundValue {
       require(msg.value % COIN_PRICE == 0, "Value of this coin is exactly 0.0001 ETH, it is not possible to buy less than 1 unit!");
@@ -16,10 +17,12 @@ contract RealStateCoin is ERC20, Ownable {
 
     constructor(
         uint256 initialSupply,
+        uint256 lockedCoinAmount,
         string memory coinName,
         string memory coinSymbol,
         address owner
     ) ERC20(coinName, coinSymbol) {
+        lockedAmount = lockedCoinAmount;
         _transferOwnership(owner);
         _mint(owner, initialSupply);
     }

@@ -37,19 +37,26 @@ describe("RealStateNFT", function () {
         it("Should mint a new NFT", async function() {
             const {nftContract, owner} = await loadFixture(deployRealStateNFT);
 
-            await nftContract.createNFT("www.google.com", 0, "", "", {
+            await nftContract.createNFT("www.google.com", 10, 2, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
+            const rstCoinContractAddress = await nftContract.tokenCoin(0);
+
+            const RealStateCoin = await ethers.getContractFactory("RealStateCoin");
+            const rstCoinContract = await RealStateCoin.attach(rstCoinContractAddress);
+
             const balance = await nftContract.balanceOf(owner);
+            const lockedAmount = await rstCoinContract.lockedAmount()
             
             expect(balance).to.equal(1);
+            expect(lockedAmount).to.equal(2);
         });
 
         it("Should emit new created NFT event", async function() {
             const {nftContract, owner} = await loadFixture(deployRealStateNFT);
 
-            await expect(await nftContract.createNFT("www.google.com", 0, "", "", {
+            await expect(await nftContract.createNFT("www.google.com", 0, 0, "", "", {
                 value: ethers.parseEther("0.5")
             }))
             .to.emit(nftContract, "NewNFT")
@@ -59,7 +66,7 @@ describe("RealStateNFT", function () {
         it("Should validate the token owner", async function() {
             const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
 
-            await nftContract.connect(user1).createNFT("www.google.com", 0, "", "", {
+            await nftContract.connect(user1).createNFT("www.google.com", 0, 0, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
@@ -71,17 +78,25 @@ describe("RealStateNFT", function () {
         it("Should show error when ETH value is less than minimum required", async function() {
             const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
 
-            await expect(nftContract.connect(user1).createNFT("www.google.com", 0, "", "", {
+            await expect(nftContract.connect(user1).createNFT("www.google.com", 0, 0, "", "", {
                 value: ethers.parseEther("0.49")
-            })).to.be.revertedWith("Value sent is not equals to the required ETH value.");
+            })).to.be.revertedWith("Value sent is not equals to the required ETH value (0.5 ETH).");
         });
 
         it("Should show error when ETH value is more than minimum required", async function() {
             const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
 
-            await expect(nftContract.connect(user1).createNFT("www.google.com", 0, "", "", {
+            await expect(nftContract.connect(user1).createNFT("www.google.com", 0, 0, "", "", {
                 value: ethers.parseEther("0.501")
-            })).to.be.revertedWith("Value sent is not equals to the required ETH value.");
+            })).to.be.revertedWith("Value sent is not equals to the required ETH value (0.5 ETH).");
+        });
+
+        it("Should show error when locked amount of tokens is bigger than initial supply", async function() {
+            const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
+
+            await expect(nftContract.connect(user1).createNFT("www.google.com", 0, 1, "", "", {
+                value: ethers.parseEther("0.5")
+            })).to.be.revertedWith("Locked amount of tokens is not allowed, it is bigger than the provided initial supply.");
         });
 
         it("Should validate the contract balance increases after a Mint", async function() {
@@ -91,7 +106,7 @@ describe("RealStateNFT", function () {
 
             ethers.provider.getBalance(nftContract);
 
-            await nftContract.connect(user1).createNFT("www.google.com", 0, "", "", {
+            await nftContract.connect(user1).createNFT("www.google.com", 0, 0, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
@@ -106,7 +121,7 @@ describe("RealStateNFT", function () {
         it("Should validate the user and owner balances are correct after buying tokens", async function() {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
-            await nftContract.connect(user1).createNFT("www.google.com", 150, "", "", {
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
@@ -135,7 +150,7 @@ describe("RealStateNFT", function () {
         it("Should validate the holder percentage is correct after buying some coins", async function() {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
-            await nftContract.connect(user1).createNFT("www.google.com", 150, "", "", {
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
@@ -156,7 +171,7 @@ describe("RealStateNFT", function () {
         it("Should revert buyCoin operation when value sent is not allowed", async function() {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
-            await nftContract.connect(user1).createNFT("www.google.com", 150, "", "", {
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
@@ -171,11 +186,11 @@ describe("RealStateNFT", function () {
         });
     });
 
-    describe("Buying tokens", async function() {
-        it("Should validate the user and owner balances are correct after buying tokens", async function() {
+    describe("Rent", async function() {
+        it("Should validate rentee is alocated in the property", async function() {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
-            await nftContract.connect(user1).createNFT("www.google.com", 150, "", "", {
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
@@ -189,13 +204,37 @@ describe("RealStateNFT", function () {
         it("Should revert when trying to setup a client on a property that the caller does not own", async function() {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
-            await nftContract.connect(user1).createNFT("www.google.com", 150, "", "", {
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
                 value: ethers.parseEther("0.5")
             });
 
             await expect(nftContract.connect(owner).setPropertyClient(user2.address, 0, ethers.parseUnits("0.5", "ether")))
                 .to.be.revertedWith("You are not the property owner, thus cannot do this action!");
 
+        });
+
+        it("Should validate rent payment is successful", async function() {
+            const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
+            
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
+                value: ethers.parseEther("0.5")
+            });
+
+            const rstCoinContractAddress = await nftContract.tokenCoin(0);
+
+            const RealStateCoin = await ethers.getContractFactory("RealStateCoin");
+            const rstCoinContract = await RealStateCoin.attach(rstCoinContractAddress);
+            const rstCoinAddress = await rstCoinContract.getAddress()
+
+            let rstBalance = await ethers.provider.getBalance(rstCoinAddress)
+
+            console.log("RSTCoin balance before: "+ rstBalance)
+
+            await nftContract.connect(user2).payRent(0);
+
+            rstBalance = await ethers.provider.getBalance(rstCoinAddress)
+
+            console.log("RSTCoin balance before: "+ rstBalance)
         });
     });
 });

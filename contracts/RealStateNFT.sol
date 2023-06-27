@@ -29,15 +29,23 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
         _;
     }
 
+    modifier isPropertyRentee(uint256 propertyTokenId) {
+        PropertyRentRules memory propertyRentRules = propertyClient[propertyTokenId];
+        require(msg.sender == propertyRentRules.client, "You are not the property rentee, thus cannot do this action!");
+        _;
+    }
+
     constructor() ERC721("RealStateNFT", "RST") {}
 
     function createNFT(
         string memory nftURI,
         uint256 initialSupply,
+        uint256 lockedAmount,
         string memory coinName,
         string memory coinSymbol
     ) payable public {
-        require(msg.value == NFT_VALUE, "Value sent is not equals to the required ETH value.");
+        require(msg.value == NFT_VALUE, "Value sent is not equals to the required ETH value (0.5 ETH).");
+        require(initialSupply >= lockedAmount, "Locked amount of tokens is not allowed, it is bigger than the provided initial supply.");
 
         uint256 newTokenId = _nftIds.current();
 
@@ -48,6 +56,7 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
 
         tokenCoin[newTokenId] = new RealStateCoin(
             initialSupply,
+            lockedAmount,
             coinName,
             coinSymbol,
             msg.sender
@@ -66,5 +75,15 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
         uint256 rentValue
     ) public isPropertyOwner(propertyTokenId) {
         propertyClient[propertyTokenId] = PropertyRentRules(client, rentValue);
+    }
+
+    function payRent(uint256 propertyTokenId) public payable isPropertyRentee(propertyTokenId) {
+        PropertyRentRules memory propertyRentRules = propertyClient[propertyTokenId];
+        require(msg.value == propertyRentRules.rentValue, "Value sent to pay the rent should be exactly to the rent value.");
+
+        //address propertyOwner = ownerOf(propertyTokenId);
+        address rstCoin = address(tokenCoin[propertyTokenId]);
+        
+        payable(rstCoin).transfer(msg.value);
     }
 }
