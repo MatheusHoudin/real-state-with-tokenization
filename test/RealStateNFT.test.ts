@@ -34,6 +34,14 @@ describe("RealStateNFT", function () {
 
     describe("Minting", async function() {
 
+        it("Should revert when provided supply is less than locked amount", async function() {
+            const {nftContract, owner} = await loadFixture(deployRealStateNFT);
+
+            await expect(nftContract.createNFT("www.google.com", 2, 10, "", "", {
+                value: ethers.parseEther("0.5")
+            })).to.be.revertedWith("Locked amount of tokens is not allowed, it is bigger than the provided initial supply.");
+        });
+
         it("Should mint a new NFT", async function() {
             const {nftContract, owner} = await loadFixture(deployRealStateNFT);
 
@@ -59,7 +67,7 @@ describe("RealStateNFT", function () {
             await expect(await nftContract.createNFT("www.google.com", 0, 0, "", "", {
                 value: ethers.parseEther("0.5")
             }))
-            .to.emit(nftContract, "NewNFT")
+            .to.emit(nftContract, "NFTMinted")
             .withArgs(0, "www.google.com", anyValue, owner.address); // We accept any value as `when` arg
         });
 
@@ -118,6 +126,29 @@ describe("RealStateNFT", function () {
     });
 
     describe("Buying tokens", async function() {
+
+        it("Should revert when trying to buy more tokens than what is available", async function() {
+            const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
+            
+            await nftContract.connect(user1).createNFT("www.google.com", 10, 2, "", "", {
+                value: ethers.parseEther("0.5")
+            });
+
+            const rstCoinContractAddress = await nftContract.tokenCoin(0);
+
+            const RealStateCoin = await ethers.getContractFactory("RealStateCoin");
+            const rstCoinContract = await RealStateCoin.attach(rstCoinContractAddress);
+            
+            await expect(nftContract.connect(user2).buyCoins(0, user2.address,  {
+                value: ethers.parseEther("0.0009")
+            })).to.be.revertedWith("There are not enough available tokens to complete this operation");
+
+            const user1CoinBalance = await rstCoinContract.balanceOf(user1.address)
+
+            expect(user1CoinBalance).to.equal(10);
+
+        });
+
         it("Should validate the user and owner balances are correct after buying tokens", async function() {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
@@ -141,6 +172,9 @@ describe("RealStateNFT", function () {
             const user2CoinBalance = await rstCoinContract.balanceOf(user2.address)
             user1CoinBalance = await rstCoinContract.balanceOf(user1.address)
 
+            const availableAmount = await rstCoinContract.availableTokenAmount();
+
+            expect(availableAmount).to.equal(79);
             expect(user1CoinBalance).to.equal(129);
             expect(user2CoinBalance).to.equal(21);
             expect(rstCoinContractAddress).to.not.equal("0x0000000000000000000000000000000000000000")
@@ -220,21 +254,42 @@ describe("RealStateNFT", function () {
                 value: ethers.parseEther("0.5")
             });
 
-            const rstCoinContractAddress = await nftContract.tokenCoin(0);
+            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.5", "ether"))
+            await nftContract.connect(user2).payRent(0, {
+                value: ethers.parseEther("0.5")
+            });
+        });
 
-            const RealStateCoin = await ethers.getContractFactory("RealStateCoin");
-            const rstCoinContract = await RealStateCoin.attach(rstCoinContractAddress);
-            const rstCoinAddress = await rstCoinContract.getAddress()
+        it("Should validate transation is reverted when another user rather than rentee tries to pay", async function() {
+            const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
+            
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
+                value: ethers.parseEther("0.5")
+            });
 
-            let rstBalance = await ethers.provider.getBalance(rstCoinAddress)
+            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.5", "ether"))
+            
+            await expect(nftContract.connect(owner).payRent(0, {
+                value: ethers.parseEther("0.5")
+            })).to.be.revertedWith("You are not the property rentee, thus cannot do this action!");
+        });
 
-            console.log("RSTCoin balance before: "+ rstBalance)
+        it("Should validate transation is reverted when paying less than rent value", async function() {
+            const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
+            
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
+                value: ethers.parseEther("0.5")
+            });
 
-            await nftContract.connect(user2).payRent(0);
+            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.5", "ether"))
+            
+            await expect(nftContract.connect(user2).payRent(0, {
+                value: ethers.parseEther("0.49")
+            })).to.be.revertedWith("Value sent to pay the rent should be exactly the rent value.");
 
-            rstBalance = await ethers.provider.getBalance(rstCoinAddress)
-
-            console.log("RSTCoin balance before: "+ rstBalance)
+            await expect(nftContract.connect(user2).payRent(0, {
+                value: ethers.parseEther("0.51")
+            })).to.be.revertedWith("Value sent to pay the rent should be exactly the rent value.");
         });
     });
 });

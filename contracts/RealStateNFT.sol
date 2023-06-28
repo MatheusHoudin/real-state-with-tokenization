@@ -21,7 +21,7 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
     mapping(uint256 => RealStateCoin) public tokenCoin;
     mapping(uint256 => PropertyRentRules) public propertyClient;
 
-    event NewNFT(uint256 nftId, string nftURI, address realStateCoinContract, address owner);
+    event NFTMinted(uint256 nftId, string nftURI, address realStateCoinContract, address owner);
 
     modifier isPropertyOwner(uint256 propertyTokenId) {
         address propertyOwner = ownerOf(propertyTokenId);
@@ -62,7 +62,7 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
             msg.sender
         );
         
-        emit NewNFT(newTokenId, nftURI, address(tokenCoin[newTokenId]), msg.sender);
+        emit NFTMinted(newTokenId, nftURI, address(tokenCoin[newTokenId]), msg.sender);
     }
 
     function buyCoins(uint256 nftId, address to) public payable {
@@ -79,9 +79,8 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
 
     function payRent(uint256 propertyTokenId) public payable isPropertyRentee(propertyTokenId) {
         PropertyRentRules memory propertyRentRules = propertyClient[propertyTokenId];
-        require(msg.value == propertyRentRules.rentValue, "Value sent to pay the rent should be exactly to the rent value.");
+        require(msg.value == propertyRentRules.rentValue, "Value sent to pay the rent should be exactly the rent value.");
 
-        //address propertyOwner = ownerOf(propertyTokenId);
         address rstCoin = address(tokenCoin[propertyTokenId]);
         
         payable(rstCoin).transfer(msg.value);
