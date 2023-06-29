@@ -258,6 +258,17 @@ describe("RealStateNFT", function () {
             await nftContract.connect(user2).payRent(0, {
                 value: ethers.parseEther("0.5")
             });
+
+            const rstCoinContractAddress = await nftContract.tokenCoin(0);
+
+            const RealStateCoin = await ethers.getContractFactory("RealStateCoin");
+            const rstCoinContract = await RealStateCoin.attach(rstCoinContractAddress);
+
+            const coinContractBalance = await ethers.provider.getBalance(rstCoinContract);
+            const contractTotalIncome = await rstCoinContract.totalIncomeReceived();
+            
+            expect(coinContractBalance).to.equal(ethers.parseUnits("0.5", "ether"));
+            expect(contractTotalIncome).to.equal(ethers.parseUnits("0.5", "ether"));
         });
 
         it("Should validate transation is reverted when another user rather than rentee tries to pay", async function() {
@@ -290,6 +301,35 @@ describe("RealStateNFT", function () {
             await expect(nftContract.connect(user2).payRent(0, {
                 value: ethers.parseEther("0.51")
             })).to.be.revertedWith("Value sent to pay the rent should be exactly the rent value.");
+        });
+    });
+
+    describe("Dividends", async function() {
+        it("Should validate rent payment is successful", async function() {
+            const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
+            
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
+                value: ethers.parseEther("0.5")
+            });
+
+            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.1", "ether"))
+            await nftContract.connect(user2).payRent(0, {
+                value: ethers.parseEther("0.1")
+            });
+
+            await nftContract.connect(user2).buyCoins(0, user2.address,  {
+                value: ethers.parseEther("0.0021")
+            });
+
+            const rstCoinContractAddress = await nftContract.tokenCoin(0);
+
+            const RealStateCoin = await ethers.getContractFactory("RealStateCoin");
+            const rstCoinContract = await RealStateCoin.attach(rstCoinContractAddress);
+
+            
+            await expect(await rstCoinContract.connect(user1).withdrawDividends())
+            .to.emit(rstCoinContract, "DividendPaid")
+            .withArgs(user1.address, ethers.parseUnits("0.086", "ether"));
         });
     });
 });

@@ -10,11 +10,20 @@ contract RealStateCoin is ERC20, Ownable {
     uint public constant COIN_PRICE = 0.0001 ether;
     uint256 public lockedAmount;
     uint256 public availableTokenAmount;
+    uint256 public totalIncomeReceived;
+
+    mapping(address => uint256) public lastWithdrawalBase;
 
     event BuyToken(address buyer, uint256 amount);
+    event DividendPaid(address receiver, uint256 amount);
 
     modifier isARoundValue {
       require(msg.value % COIN_PRICE == 0, "Value of this coin is exactly 0.0001 ETH, it is not possible to buy less than 1 unit!");
+      _;
+    }
+
+    modifier isATokenHolder {
+      require(balanceOf(msg.sender) > 0, "You are not a token holder, thus cannot call this function!");
       _;
     }
 
@@ -46,7 +55,24 @@ contract RealStateCoin is ERC20, Ownable {
         return (balanceOf(holder) * 100) / totalSupply();
     }
 
-    receive() external payable {}
+    function withdrawDividends() public payable isATokenHolder returns (bool) {
+        uint contractBalance = address(this).balance;
+        require(contractBalance > 0, "There is no balance available!");
+        
+        uint256 withdrawalAmount = (((totalIncomeReceived - lastWithdrawalBase[msg.sender]) / 100) * getHolderPercentage(msg.sender));
+
+        lastWithdrawalBase[msg.sender] = totalIncomeReceived;
+
+        (bool status,) = payable(msg.sender).call{value: withdrawalAmount}("");
+
+        emit DividendPaid(msg.sender, withdrawalAmount);
+
+        return status;
+    }
 
     fallback() external payable {}
+
+    receive() external payable {
+        totalIncomeReceived += msg.value;
+    }
 }

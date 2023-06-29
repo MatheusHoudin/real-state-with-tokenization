@@ -77,12 +77,13 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
         propertyClient[propertyTokenId] = PropertyRentRules(client, rentValue);
     }
 
-    function payRent(uint256 propertyTokenId) public payable isPropertyRentee(propertyTokenId) {
+    function payRent(uint256 propertyTokenId) public payable isPropertyRentee(propertyTokenId) returns (bool){
         PropertyRentRules memory propertyRentRules = propertyClient[propertyTokenId];
         require(msg.value == propertyRentRules.rentValue, "Value sent to pay the rent should be exactly the rent value.");
 
         address rstCoin = address(tokenCoin[propertyTokenId]);
         
-        payable(rstCoin).transfer(msg.value);
+        (bool status,) = payable(rstCoin).call{value: msg.value}("");
+        return status;
     }
 }
