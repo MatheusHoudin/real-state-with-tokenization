@@ -164,6 +164,8 @@ describe("RealStateNFT", function () {
             let user1CoinBalance = await rstCoinContract.balanceOf(user1.address)
 
             expect(user1CoinBalance).to.equal(150);
+
+            const nftOwnerPreviousBalance = await ethers.provider.getBalance(user1.address);
             
             await nftContract.connect(user2).buyCoins(0, user2.address,  {
                 value: ethers.parseEther("0.0021")
@@ -174,6 +176,9 @@ describe("RealStateNFT", function () {
 
             const availableAmount = await rstCoinContract.availableTokenAmount();
 
+            const nftOwnerAfterBalance = await ethers.provider.getBalance(user1.address);
+            
+            expect(nftOwnerAfterBalance > nftOwnerPreviousBalance);
             expect(availableAmount).to.equal(79);
             expect(user1CoinBalance).to.equal(129);
             expect(user2CoinBalance).to.equal(21);
@@ -265,7 +270,7 @@ describe("RealStateNFT", function () {
             const rstCoinContract = await RealStateCoin.attach(rstCoinContractAddress);
 
             const coinContractBalance = await ethers.provider.getBalance(rstCoinContract);
-            const contractTotalIncome = await rstCoinContract.totalIncomeReceived();
+            const contractTotalIncome = await rstCoinContract.totalRentIncomeReceived();
             
             expect(coinContractBalance).to.equal(ethers.parseUnits("0.5", "ether"));
             expect(contractTotalIncome).to.equal(ethers.parseUnits("0.5", "ether"));
@@ -330,6 +335,53 @@ describe("RealStateNFT", function () {
             await expect(await rstCoinContract.connect(user1).withdrawDividends())
             .to.emit(rstCoinContract, "DividendPaid")
             .withArgs(user1.address, ethers.parseUnits("0.086", "ether"));
+        });
+
+        it("Should revert when contract does not have any balance to withdraw", async function() {
+            const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
+            
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
+                value: ethers.parseEther("0.5")
+            });
+
+            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.1", "ether"))
+            await nftContract.connect(user2).buyCoins(0, user2.address,  {
+                value: ethers.parseEther("0.0021")
+            });
+
+            const rstCoinContractAddress = await nftContract.tokenCoin(0);
+
+            const RealStateCoin = await ethers.getContractFactory("RealStateCoin");
+            const rstCoinContract = await RealStateCoin.attach(rstCoinContractAddress);
+            
+            await expect(rstCoinContract.connect(user1).withdrawDividends())
+            .to.be.revertedWith("There is no balance available!")
+        });
+
+        it("Should revert when holder has withdrawn everything and tries it again", async function() {
+            const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
+            
+            await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
+                value: ethers.parseEther("0.5")
+            });
+
+            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.1", "ether"))
+            await nftContract.connect(user2).payRent(0, {
+                value: ethers.parseEther("0.1")
+            });
+            await nftContract.connect(user2).buyCoins(0, user2.address,  {
+                value: ethers.parseEther("0.0021")
+            });
+
+            const rstCoinContractAddress = await nftContract.tokenCoin(0);
+
+            const RealStateCoin = await ethers.getContractFactory("RealStateCoin");
+            const rstCoinContract = await RealStateCoin.attach(rstCoinContractAddress);
+
+            await rstCoinContract.connect(user1).withdrawDividends()
+
+            await expect(rstCoinContract.connect(user1).withdrawDividends())
+            .to.be.revertedWith("Holder does not have any dividend to withdraw now!")
         });
     });
 });

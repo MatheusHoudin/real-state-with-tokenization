@@ -10,7 +10,7 @@ contract RealStateCoin is ERC20, Ownable {
     uint public constant COIN_PRICE = 0.0001 ether;
     uint256 public lockedAmount;
     uint256 public availableTokenAmount;
-    uint256 public totalIncomeReceived;
+    uint256 public totalRentIncomeReceived;
 
     mapping(address => uint256) public lastWithdrawalBase;
 
@@ -48,6 +48,9 @@ contract RealStateCoin is ERC20, Ownable {
         _transfer(owner(), to, coinAmount);
         
         availableTokenAmount -= coinAmount;
+
+        payable(owner()).call{value: msg.value}("");
+
         emit BuyToken(msg.sender, coinAmount);
     }
 
@@ -57,11 +60,12 @@ contract RealStateCoin is ERC20, Ownable {
 
     function withdrawDividends() public payable isATokenHolder returns (bool) {
         uint contractBalance = address(this).balance;
-        require(contractBalance > 0, "There is no balance available!");
-        
-        uint256 withdrawalAmount = (((totalIncomeReceived - lastWithdrawalBase[msg.sender]) / 100) * getHolderPercentage(msg.sender));
+        uint256 withdrawalAmount = (((totalRentIncomeReceived - lastWithdrawalBase[msg.sender]) / 100) * getHolderPercentage(msg.sender));
 
-        lastWithdrawalBase[msg.sender] = totalIncomeReceived;
+        require(contractBalance > 0, "There is no balance available!");
+        require(withdrawalAmount > 0, "Holder does not have any dividend to withdraw now!");
+
+        lastWithdrawalBase[msg.sender] = totalRentIncomeReceived;
 
         (bool status,) = payable(msg.sender).call{value: withdrawalAmount}("");
 
@@ -73,6 +77,6 @@ contract RealStateCoin is ERC20, Ownable {
     fallback() external payable {}
 
     receive() external payable {
-        totalIncomeReceived += msg.value;
+        totalRentIncomeReceived += msg.value;
     }
 }
