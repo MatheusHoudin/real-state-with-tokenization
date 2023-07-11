@@ -1,10 +1,11 @@
 import React from "react";
+import {  Link } from "react-router-dom";
 
-const CustomNavbar = () => {
+const CustomNavbar = ({walletAddress}) => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <a className="navbar-brand" href="#">
-        Navbar
+        RST
       </a>
       <button
         className="navbar-toggler"
@@ -21,47 +22,24 @@ const CustomNavbar = () => {
       <div className="collapse navbar-collapse" id="navbarNavDropdown">
         <ul className="navbar-nav">
           <li className="nav-item active">
-            <a className="nav-link" href="#">
-              Home <span className="sr-only">(current)</span>
+            <a className="nav-link" href="http://localhost:5000/">
+              Discover
             </a>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
-              Features
+            <a className="nav-link" href="http://localhost:5000/mynfts">
+              My NFTs
             </a>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#">
-              Pricing
+            <a className="nav-link" href="http://localhost:5000/rent">
+              My Rent
             </a>
-          </li>
-          <li className="nav-item dropdown">
-            <a
-              className="nav-link dropdown-toggle"
-              href="#"
-              id="navbarDropdownMenuLink"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Dropdown link
-            </a>
-            <div
-              className="dropdown-menu"
-              aria-labelledby="navbarDropdownMenuLink"
-            >
-              <a className="dropdown-item" href="#">
-                Action
-              </a>
-              <a className="dropdown-item" href="#">
-                Another action
-              </a>
-              <a className="dropdown-item" href="#">
-                Something else here
-              </a>
-            </div>
           </li>
         </ul>
+        <span class="navbar-text ml-auto">
+          Wallet: {walletAddress.substring(0,6) + "..."}
+        </span>
       </div>
     </nav>
   );

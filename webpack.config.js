@@ -5,12 +5,14 @@ module.exports = {
   entry: './index.js',
   mode: 'development',
   output: {
+    publicPath: '/',
     path: path.resolve(__dirname, './dist'),
     filename: 'index_bundle.js',
   },
   target: 'web',
   devServer: {
     port: '5000',
+    historyApiFallback: true,
     static: {
       directory: path.join(__dirname, 'public')
 },

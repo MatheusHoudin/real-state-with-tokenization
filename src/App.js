@@ -1,10 +1,14 @@
 import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Web3 from 'web3';
 import { useEffect, useState } from 'react';
 import RealStateNFT from '../artifacts/contracts/RealStateNFT.sol/RealStateNFT.json';
 import RealStateCoin from '../artifacts/contracts/RealStateCoin.sol/RealStateCoin.json';
 import CustomNavBar from "./Navigation/CustomNavBar";
+import DiscoverPage from "./Pages/DiscoverPage";
+import MyNftsPage from "./Pages/MyNftsPage";
+import RentPage from "./Pages/RentPage";
 
 const RealStateNFTAbi = RealStateNFT.abi;
 const RealStateNFTAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
@@ -36,14 +40,22 @@ const App = () =>{
 
     return (
         <div>
-            <CustomNavBar/>
-            <span style={{ color: "black" }}>
-                This is your wallet address {getContractOwner}
-            </span>
-            <button onClick={createNewNFT}>
-                Create a new NFT
-            </button>
+            <CustomNavBar walletAddress = {getContractOwner}/>
+            <BrowserRouter>
+                <Routes>
+                    <Route path='/' exact element={
+                        <DiscoverPage />
+                    } />
+                    <Route path='/mynfts' element={
+                        <MyNftsPage />
+                    } />
+                    <Route path='/rent' element={
+                        <RentPage />
+                    } />
+                </Routes>
+            </BrowserRouter>
         </div>
+
     )
 }
 
