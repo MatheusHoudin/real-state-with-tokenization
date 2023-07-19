@@ -1,10 +1,11 @@
 import React from "react";
 import {  Link } from "react-router-dom";
+import CreateNFTForm from "../Form/CreateNFTForm";
 
 const MyNftsPage = () => {
   return (
     <div>
-        MyNftsPage
+        <CreateNFTForm/>
     </div>
   );
 };
