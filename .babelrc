@@ -8,6 +8,7 @@
         ["@babel/preset-react", {"runtime": "automatic"}] //for react
         
     ],
+    "sourceType": "unambiguous",
     /*
         Babel's code transformations are enabled by applying plugins (or presets) to your configuration file.
     */
