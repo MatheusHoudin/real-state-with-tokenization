@@ -15,6 +15,7 @@ contract RealStateCoin is ERC20, Ownable {
     mapping(address => uint256) public lastWithdrawalBase;
 
     event BuyToken(address buyer, uint256 amount);
+    
     event DividendPaid(address receiver, uint256 amount);
 
     modifier isARoundValue {

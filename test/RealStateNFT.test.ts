@@ -38,7 +38,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner} = await loadFixture(deployRealStateNFT);
 
             await expect(nftContract.createNFT("www.google.com", 2, 10, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             })).to.be.revertedWith("Locked amount of tokens is not allowed, it is bigger than the provided initial supply.");
         });
 
@@ -46,7 +46,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner} = await loadFixture(deployRealStateNFT);
 
             await nftContract.createNFT("www.google.com", 10, 2, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             const rstCoinContractAddress = await nftContract.tokenCoin(0);
@@ -65,7 +65,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner} = await loadFixture(deployRealStateNFT);
 
             await expect(await nftContract.createNFT("www.google.com", 0, 0, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             }))
             .to.emit(nftContract, "NFTMinted")
             .withArgs(0, "www.google.com", anyValue, owner.address); // We accept any value as `when` arg
@@ -75,7 +75,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
 
             await nftContract.connect(user1).createNFT("www.google.com", 0, 0, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             const tokenOwner = await nftContract.ownerOf(0);    
@@ -87,23 +87,23 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
 
             await expect(nftContract.connect(user1).createNFT("www.google.com", 0, 0, "", "", {
-                value: ethers.parseEther("0.49")
-            })).to.be.revertedWith("Value sent is not equals to the required ETH value (0.5 ETH).");
+                value: ethers.parseEther("0.049")
+            })).to.be.revertedWith("Value sent is not equals to the required ETH value (0.05 ETH).");
         });
 
         it("Should show error when ETH value is more than minimum required", async function() {
             const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
 
             await expect(nftContract.connect(user1).createNFT("www.google.com", 0, 0, "", "", {
-                value: ethers.parseEther("0.501")
-            })).to.be.revertedWith("Value sent is not equals to the required ETH value (0.5 ETH).");
+                value: ethers.parseEther("0.0501")
+            })).to.be.revertedWith("Value sent is not equals to the required ETH value (0.05 ETH).");
         });
 
         it("Should show error when locked amount of tokens is bigger than initial supply", async function() {
             const {nftContract, owner, user1} = await loadFixture(deployRealStateNFT);
 
             await expect(nftContract.connect(user1).createNFT("www.google.com", 0, 1, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             })).to.be.revertedWith("Locked amount of tokens is not allowed, it is bigger than the provided initial supply.");
         });
 
@@ -115,13 +115,13 @@ describe("RealStateNFT", function () {
             ethers.provider.getBalance(nftContract);
 
             await nftContract.connect(user1).createNFT("www.google.com", 0, 0, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             const contractBalanceAfterTransaction = await ethers.provider.getBalance(nftContract);  
             
             expect(previousContractBalance).to.be.equal(0);
-            expect(contractBalanceAfterTransaction).to.be.equals(ethers.parseEther("0.5"));
+            expect(contractBalanceAfterTransaction).to.be.equals(ethers.parseEther("0.05"));
         });
     });
 
@@ -131,7 +131,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 10, 2, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             const rstCoinContractAddress = await nftContract.tokenCoin(0);
@@ -153,7 +153,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             const rstCoinContractAddress = await nftContract.tokenCoin(0);
@@ -190,7 +190,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             const rstCoinContractAddress = await nftContract.tokenCoin(0);
@@ -211,7 +211,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             const rstCoinContractAddress = await nftContract.tokenCoin(0);
@@ -230,24 +230,24 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
-            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.5", "ether"));
+            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.05", "ether"));
 
 
             expect((await nftContract.propertyClient(0)).client).to.equal(user2.address);
-            expect((await nftContract.propertyClient(0)).rentValue).to.equal(ethers.parseUnits("0.5", "ether"));
+            expect((await nftContract.propertyClient(0)).rentValue).to.equal(ethers.parseUnits("0.05", "ether"));
         });
 
         it("Should revert when trying to setup a client on a property that the caller does not own", async function() {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
-            await expect(nftContract.connect(owner).setPropertyClient(user2.address, 0, ethers.parseUnits("0.5", "ether")))
+            await expect(nftContract.connect(owner).setPropertyClient(user2.address, 0, ethers.parseUnits("0.05", "ether")))
                 .to.be.revertedWith("You are not the property owner, thus cannot do this action!");
 
         });
@@ -256,12 +256,12 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
-            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.5", "ether"))
+            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.05", "ether"))
             await nftContract.connect(user2).payRent(0, {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             const rstCoinContractAddress = await nftContract.tokenCoin(0);
@@ -272,21 +272,21 @@ describe("RealStateNFT", function () {
             const coinContractBalance = await ethers.provider.getBalance(rstCoinContract);
             const contractTotalIncome = await rstCoinContract.totalRentIncomeReceived();
             
-            expect(coinContractBalance).to.equal(ethers.parseUnits("0.5", "ether"));
-            expect(contractTotalIncome).to.equal(ethers.parseUnits("0.5", "ether"));
+            expect(coinContractBalance).to.equal(ethers.parseUnits("0.05", "ether"));
+            expect(contractTotalIncome).to.equal(ethers.parseUnits("0.05", "ether"));
         });
 
         it("Should validate transation is reverted when another user rather than rentee tries to pay", async function() {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
-            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.5", "ether"))
+            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.05", "ether"))
             
             await expect(nftContract.connect(owner).payRent(0, {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             })).to.be.revertedWith("You are not the property rentee, thus cannot do this action!");
         });
 
@@ -294,17 +294,17 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
-            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.5", "ether"))
+            await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.05", "ether"))
             
             await expect(nftContract.connect(user2).payRent(0, {
                 value: ethers.parseEther("0.49")
             })).to.be.revertedWith("Value sent to pay the rent should be exactly the rent value.");
 
             await expect(nftContract.connect(user2).payRent(0, {
-                value: ethers.parseEther("0.51")
+                value: ethers.parseEther("0.051")
             })).to.be.revertedWith("Value sent to pay the rent should be exactly the rent value.");
         });
     });
@@ -314,7 +314,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.1", "ether"))
@@ -341,7 +341,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.1", "ether"))
@@ -362,7 +362,7 @@ describe("RealStateNFT", function () {
             const {nftContract, owner, user1, user2} = await loadFixture(deployRealStateNFT);
             
             await nftContract.connect(user1).createNFT("www.google.com", 150, 50, "", "", {
-                value: ethers.parseEther("0.5")
+                value: ethers.parseEther("0.05")
             });
 
             await nftContract.connect(user1).setPropertyClient(user2.address, 0, ethers.parseUnits("0.1", "ether"))

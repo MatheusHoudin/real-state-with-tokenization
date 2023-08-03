@@ -17,7 +17,7 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _nftIds;
 
-    uint public constant NFT_VALUE = 0.5 ether;
+    uint public constant NFT_VALUE = 0.05 ether;
     mapping(uint256 => RealStateCoin) public tokenCoin;
     mapping(uint256 => PropertyRentRules) public propertyClient;
 
@@ -44,7 +44,7 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
         string memory coinName,
         string memory coinSymbol
     ) payable public {
-        require(msg.value == NFT_VALUE, "Value sent is not equals to the required ETH value (0.5 ETH).");
+        require(msg.value == NFT_VALUE, "Value sent is not equals to the required ETH value (0.05 ETH).");
         require(initialSupply >= lockedAmount, "Locked amount of tokens is not allowed, it is bigger than the provided initial supply.");
 
         uint256 newTokenId = _nftIds.current();

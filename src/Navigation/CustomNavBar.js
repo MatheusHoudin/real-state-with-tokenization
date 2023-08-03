@@ -1,7 +1,46 @@
-import React from "react";
+import React, { useContext } from "react";
 import {  Link } from "react-router-dom";
+import {
+  MDBBtn
+} from 'mdb-react-ui-kit';
+import { RealStateContext } from '../App'
 
-const CustomNavbar = ({walletAddress}) => {
+const CustomNavbar = () => {
+
+  const { getConnectedWallet, setConnectedWallet } = useContext(RealStateContext)
+
+  async function getAccount() {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+      .catch((err) => {
+        if (err.code === 4001) {
+          // EIP-1193 userRejectedRequest error
+          // If this happens, the user rejected the connection request.
+          console.log('Please connect to MetaMask.');
+        } else {
+          console.error(err);
+        }
+      });
+    if (accounts) {
+      const account = accounts[0];
+      setConnectedWallet(account)
+      localStorage.setItem("connectedWallet", account);
+    }  
+  }
+
+  function getConnectButtonOrWalletAddress() {
+    if (getConnectedWallet) {
+      return (
+        <b class="navbar-text ml-auto">
+          Wallet: {getConnectedWallet}
+        </b>
+      )
+    } else {
+      return (
+        <MDBBtn onClick={getAccount}>Connect Wallet</MDBBtn>
+      )
+    }
+  }
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <a className="navbar-brand" href="#">
@@ -37,9 +76,8 @@ const CustomNavbar = ({walletAddress}) => {
             </a>
           </li>
         </ul>
-        <span class="navbar-text ml-auto">
-          Wallet: {walletAddress.substring(0,6) + "..."}
-        </span>
+        {getConnectButtonOrWalletAddress()}
+        
       </div>
     </nav>
   );

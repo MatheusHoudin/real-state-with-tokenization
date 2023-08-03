@@ -28,7 +28,7 @@ const CreateNFTForm = () => {
         tokenSymbol
     ).send({
         from: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-        value: blockchain.web3.utils.toWei(0.5, 'ether')
+        value: blockchain.web3.utils.toWei(0.05, 'ether')
     });
 
     console.log(result)

@@ -8,39 +8,31 @@ import MyNftsPage from "./Pages/MyNftsPage";
 import RentPage from "./Pages/RentPage";
 import blockchain from "./utils/Blockchain";
 
+export const RealStateContext = React.createContext(null);
+
 const App = () =>{
     
-    const [getContractOwner, setContractOwner] = useState("");
-
-    useEffect(() => {
-        const fetchOwner = async () => {
-            await fetchContractOwner();
-        }
-
-        fetchOwner().catch(console.error);
-    }, []);
-
-    const fetchContractOwner = async () => {
-        const owner = await blockchain.nftContract.methods.owner().call();
-        setContractOwner(owner);
-    }
+    const [getConnectedWallet, setConnectedWallet] = useState(localStorage["connectedWallet"]);
 
     return (
         <div>
-            <CustomNavBar walletAddress = {getContractOwner}/>
-            <BrowserRouter>
-                <Routes>
-                    <Route path='/' exact element={
-                        <DiscoverPage />
-                    } />
-                    <Route path='/mynfts' element={
-                        <MyNftsPage />
-                    } />
-                    <Route path='/rent' element={
-                        <RentPage />
-                    } />
-                </Routes>
-            </BrowserRouter>
+            <RealStateContext.Provider value={{ getConnectedWallet, setConnectedWallet }}>
+                <CustomNavBar/>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path='/' exact element={
+                            <DiscoverPage />
+                        } />
+                        <Route path='/mynfts' element={
+                            <MyNftsPage />
+                        } />
+                        <Route path='/rent' element={
+                            <RentPage />
+                        } />
+                    </Routes>
+                </BrowserRouter>
+            </RealStateContext.Provider>
+            
         </div>
 
     )
