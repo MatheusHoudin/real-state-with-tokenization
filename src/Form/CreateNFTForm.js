@@ -31,7 +31,7 @@ const CreateNFTForm = () => {
         tokenSymbol
     ).send({
         from: connectedWallet,
-        value: blockchain.web3.utils.toWei(0.05, 'ether')
+        value: blockchain.web3.utils.toWei("0.05", 'ether')
     }).catch(err => {
       console.log(err);
     });
@@ -42,7 +42,7 @@ const CreateNFTForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault()
     await createNewNFT({
-      uri: formData.name,
+      uri: formData.nftUri,
       totalSupply: formData.totalSupply,
       lockedAmount: formData.lockedAmount,
       tokenName: formData.name,
