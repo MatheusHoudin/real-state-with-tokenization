@@ -6,17 +6,16 @@ import CustomNavBar from "./Navigation/CustomNavBar";
 import DiscoverPage from "./Pages/DiscoverPage";
 import MyNftsPage from "./Pages/MyNftsPage";
 import RentPage from "./Pages/RentPage";
-import blockchain from "./utils/Blockchain";
 
 export const RealStateContext = React.createContext(null);
 
 const App = () =>{
     
-    const [getConnectedWallet, setConnectedWallet] = useState(localStorage["connectedWallet"]);
+    const [connectedWallet, setConnectedWallet] = useState(localStorage["connectedWallet"]);
 
     return (
         <div>
-            <RealStateContext.Provider value={{ getConnectedWallet, setConnectedWallet }}>
+            <RealStateContext.Provider value={{ connectedWallet, setConnectedWallet }}>
                 <CustomNavBar/>
                 <BrowserRouter>
                     <Routes>

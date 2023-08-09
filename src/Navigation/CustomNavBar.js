@@ -7,7 +7,7 @@ import { RealStateContext } from '../App'
 
 const CustomNavbar = () => {
 
-  const { getConnectedWallet, setConnectedWallet } = useContext(RealStateContext)
+  const { connectedWallet, setConnectedWallet } = useContext(RealStateContext)
 
   async function getAccount() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
@@ -28,10 +28,10 @@ const CustomNavbar = () => {
   }
 
   function getConnectButtonOrWalletAddress() {
-    if (getConnectedWallet) {
+    if (connectedWallet) {
       return (
         <b class="navbar-text ml-auto">
-          Wallet: {getConnectedWallet}
+          Wallet: {connectedWallet}
         </b>
       )
     } else {

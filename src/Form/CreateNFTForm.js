@@ -1,12 +1,15 @@
-import {React, useState} from "react";
+import {React, useContext, useState} from "react";
 import {
   MDBInput,
   MDBBtn
 } from 'mdb-react-ui-kit';
 import blockchain from "../utils/Blockchain";
+import "../App";
+import { RealStateContext } from "../App";
 
 const CreateNFTForm = () => {
   const [formData, setFormData] = useState({name: "",symbol: "",totalSupply: 0, lockedAmount: 0, nftUri: ""});
+  const { connectedWallet, setConnectedWallet } = useContext(RealStateContext);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -27,16 +30,18 @@ const CreateNFTForm = () => {
         tokenName,
         tokenSymbol
     ).send({
-        from: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+        from: connectedWallet,
         value: blockchain.web3.utils.toWei(0.05, 'ether')
+    }).catch(err => {
+      console.log(err);
     });
 
     console.log(result)
 }
   
-  const handleSubmit = (event) => {
-    alert(`Name: ${formData.name}, Symbol: ${formData.symbol}, Total Supply: ${formData.totalSupply}, Locked Supply: ${formData.lockedAmount}, NFT URi: ${formData.nftUri}`);
-    createNewNFT({
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    await createNewNFT({
       uri: formData.name,
       totalSupply: formData.totalSupply,
       lockedAmount: formData.lockedAmount,

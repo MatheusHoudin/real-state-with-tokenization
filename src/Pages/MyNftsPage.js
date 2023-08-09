@@ -1,13 +1,15 @@
-import {React, useState, useEffect} from "react";
+import {React, useState, useContext, useEffect} from "react";
 import CreateNFTForm from "../Form/CreateNFTForm";
 import blockchain from "../utils/Blockchain";
+import { RealStateContext } from "../App";
 
 const MyNftsPage = () => {
 
   const [nftBalance, setNftBalance] = useState(0);
+  const { connectedWallet, setConnectedWallet } = useContext(RealStateContext);
 
   const updateBalance = async () => {
-    const balance = await blockchain.nftContract.methods.balanceOf("0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266").call()
+    const balance = await blockchain.nftContract.methods.balanceOf(connectedWallet).call()
     setNftBalance(balance)
   };
 

@@ -46,16 +46,21 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
+    "@alch/alchemy-web3": "^1.4.7",
     "@openzeppelin/contracts": "^4.9.2",
     "alchemy-sdk": "^2.9.2",
+    "assert": "^2.0.0",
     "babel-preset-react": "^6.24.1",
     "bootstrap": "^5.3.0",
+    "buffer": "^6.0.3",
     "css-loader": "^6.8.1",
     "dotenv": "^16.3.1",
     "mdb-react-ui-kit": "^6.1.0",
+    "process": "^0.11.10",
     "react": "^18.2.0",
     "react-bootstrap": "^2.8.0",
     "react-dom": "^18.2.0",
+    "react-error-overlay": "6.0.9",
     "react-router-dom": "^6.14.1",
     "style-loader": "^3.3.3",
     "web3": "^4.0.2"

@@ -1,14 +1,6 @@
-require('dotenv').config({path:__dirname+'/.env'});
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-gas-reporter";
-
-const { API_URL, PRIVATE_KEY } = process.env;
-
-console.log("sadsa")
-console.log(API_URL);
-console.log(PRIVATE_KEY);
-
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -23,8 +15,8 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {},
     sepolia: {
-      url: API_URL,
-      accounts: [`0x${PRIVATE_KEY}`]
+      url: "https://eth-sepolia.g.alchemy.com/v2/F7bRp3SKEAfXi_nXBw9aDa-DXwBUY_Bj",
+      accounts: [`0x1ab7b7144da91aeab90be40f1f9157a86e196226202bc82bf90b1a958e6ce7d7`]
     }
   },
   gasReporter: {
