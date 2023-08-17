@@ -12,7 +12,7 @@ const settings = {
 const alchemy = new Alchemy(settings);
 
 const RealStateNFTAbi = RealStateNFT.abi;
-const RealStateNFTAddress = "0x49b74EaFB05Df38354F81EcB3854035c2cB2A4BF";
+const RealStateNFTAddress = "0xd9f8B406d91486298915b9b6eE189Cc77dCE2C59";
 
 const RealStateCoinAbi = RealStateCoin.abi;
 

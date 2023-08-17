@@ -42,7 +42,7 @@ contract RealStateCoin is ERC20, Ownable {
     }
 
     function buyCoins(address to) public payable isARoundValue {
-        uint256 coinAmount = msg.value / COIN_PRICE;
+        uint256 coinAmount = (msg.value / COIN_PRICE) * 10 ** decimals();
 
         require(coinAmount <= availableTokenAmount, "There are not enough available tokens to complete this operation");
 

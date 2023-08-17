@@ -62,7 +62,7 @@ const CustomNavbar = () => {
         <ul className="navbar-nav">
           <li className="nav-item active">
             <a className="nav-link" href="http://localhost:5000/">
-              Discover
+              Buy Tokens
             </a>
           </li>
           <li className="nav-item">
