@@ -23,7 +23,8 @@ const rstNFTContract = new web3.eth.Contract(RealStateNFTAbi, RealStateNFTAddres
 const blockchain = {
     nftContract: rstNFTContract,
     web3: web3,
-    alchemy: alchemy
+    alchemy: alchemy,
+    realStateCoinAbi: RealStateCoinAbi
 }
 
 export default blockchain
