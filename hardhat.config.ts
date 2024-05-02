@@ -1,6 +1,10 @@
 import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-ethers";
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-gas-reporter";
+import dotenv from 'dotenv';
+
+dotenv.config()
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -15,8 +19,8 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {},
     sepolia: {
-      url: "https://eth-sepolia.g.alchemy.com/v2/F7bRp3SKEAfXi_nXBw9aDa-DXwBUY_Bj",
-      accounts: [`0x1ab7b7144da91aeab90be40f1f9157a86e196226202bc82bf90b1a958e6ce7d7`]
+      url: process.env.ALCHEMY_KEY,
+      accounts: [`${process.env.PRIVATE_KEY}`]
     }
   },
   gasReporter: {

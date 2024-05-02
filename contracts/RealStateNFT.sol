@@ -17,7 +17,7 @@ contract RealStateNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _nftIds;
 
-    uint public constant NFT_VALUE = 0.05 ether;
+    uint public constant NFT_VALUE = 0.02 ether;
     mapping(uint256 => RealStateCoin) public tokenCoin;
     mapping(uint256 => PropertyRentRules) public propertyClient;
 
